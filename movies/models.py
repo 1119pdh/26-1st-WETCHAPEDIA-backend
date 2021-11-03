@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+
 class Movie(models.Model):
     title = models.CharField(max_length=50)
     poster_image_url = models.URLField(max_length=2000)
@@ -24,8 +24,6 @@ class Movie(models.Model):
 
 class Grade(models.Model):
     name = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "grades"
@@ -33,8 +31,6 @@ class Grade(models.Model):
 
 class Source(models.Model):
     name = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "sources"
@@ -51,8 +47,6 @@ class MovieSource(models.Model):
 class Staff(models.Model):
     name = models.CharField(max_length=50)
     profile_image_url = models.URLField(max_length=2000)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "staffs"
@@ -90,8 +84,6 @@ class WishList(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "genres"
@@ -100,8 +92,6 @@ class Genre(models.Model):
 class MovieGenre(models.Model):
     movie = models.ForeignKey("Movie", on_delete=models.CASCADE)
     genre = models.ForeignKey("Genre", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "movie_genres"
@@ -121,7 +111,6 @@ class Comment(models.Model):
 class LikeComment(models.Model):
     comment = models.ForeignKey("Comment", on_delete=models.CASCADE)
     user = models.ForeignKey("users.User", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "like_comments"

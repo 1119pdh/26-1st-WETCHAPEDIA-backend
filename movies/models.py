@@ -55,7 +55,7 @@ class Staff(models.Model):
 class MovieStaff(models.Model):
     staff = models.ForeignKey("Staff", on_delete=models.CASCADE)
     movie = models.ForeignKey("Movie", on_delete=models.CASCADE)
-    role = models.CharField(max_length=50)
+    role = models.CharField(max_length=50, null=True)
     position = models.CharField(max_length=50)
 
     class Meta:
@@ -79,7 +79,7 @@ class WishList(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = "whislists"
+        db_table = "wishlists"
 
 
 class Genre(models.Model):

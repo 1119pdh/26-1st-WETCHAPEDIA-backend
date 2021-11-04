@@ -367,3 +367,9 @@ my_settings.py
 
 ## max_line problem
 pyproject.toml 
+
+## db_uploader
+db_uploader.py
+
+## csv files
+csv/

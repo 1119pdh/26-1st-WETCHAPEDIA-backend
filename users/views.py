@@ -23,7 +23,7 @@ class SignUpView(View):
                 return JsonResponse({'message':'PASSWORD_NOT_VALID'}, status = 400)
 
             if User.objects.filter(email=email).exists():
-                return JsonResponse({'message' : 'SAME_VALUE_ERROR'}, status = 400)
+                return JsonResponse({'message' : 'DUPLICATE_EMAIL_ERROR'}, status = 400)
 
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -51,9 +51,9 @@ class SignInView(View):
             if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
                 return JsonResponse({'message' : 'INVALID_USER'}, status = 401)
 
-            return JsonResponse({'message' : 'SUCCESS', 'ACCESS_TOKEN' : access_token}, status = 200)
+            return JsonResponse({'message' : 'SUCCESS', 'access_token' : access_token}, status = 200)
 
         except KeyError:
-            return JsonResponse({'message': 'KEY_ERROR'}, status = 400)
-        except User.DoesNotExist :
-            return JsonResponse({"message" : "Unauthorized"}, status = 401) 
+            return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
+        except User.DoesNotExist:
+            return JsonResponse({'message' : 'Unauthorized'}, status = 401)

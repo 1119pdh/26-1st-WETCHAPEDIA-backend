@@ -6,12 +6,14 @@ from .models import *
 
 class MovieListView(View):
     def get(self, request):
-        LIMIT = 15
-        OFFSET = 0
         source = request.GET.get("source")
         staff = request.GET.get("staff")
         title = request.GET.get("title")
         rating = request.GET.get("rating")
+        page = int(request.GET.get("page", 1))
+        page_size = int(request.GET.get("display", 15))
+        LIMIT = page_size * page
+        OFFSET = LIMIT - page_size
 
         q = Q()
         if source:
@@ -40,7 +42,7 @@ class MovieListView(View):
                     "poster_image_url": movie.poster_image_url,
                     "released_at": movie.released_at,
                     "country": movie.country,
-                    "ratings": movie.average_point,
+                    "ratings": round(movie.average_point, 1) if movie.average_point != None else 0,
                     "sources": [source.name for source in movie.sources.all()],
                 }
                 for movie in movies

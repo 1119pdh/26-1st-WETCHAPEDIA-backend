@@ -12,7 +12,7 @@ class MovieListView(View):
         staff = request.GET.get("staff")
         title = request.GET.get("title")
         rating = request.GET.get("rating")
-        print(source)
+
         q = Q()
         if source:
             q.add(Q(sources__name=source), q.AND)

@@ -11,8 +11,7 @@ class MovieListView(View):
         title = request.GET.get("title")
         rating = request.GET.get("rating")
         OFFSET = int(request.GET.get("offset", 0))
-        page_size = int(request.GET.get("display", 15))
-        LIMIT = OFFSET + page_size
+        LIMIT = int(request.GET.get("display", 15))
 
         q = Q()
         if source:
@@ -30,7 +29,7 @@ class MovieListView(View):
         movies = (
             Movie.objects.filter(q)
             .annotate(average_point=Avg("rating__rate"))
-            .order_by("-average_point")[OFFSET:LIMIT]
+            .order_by("-average_point")[OFFSET : OFFSET + LIMIT]
         )
 
         result = {
@@ -45,7 +44,7 @@ class MovieListView(View):
                     "sources": [source.name for source in movie.sources.all()],
                 }
                 for movie in movies
-            ]
+            ],
         }
 
         return JsonResponse({"message": result}, status=200)

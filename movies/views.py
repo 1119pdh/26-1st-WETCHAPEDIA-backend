@@ -8,24 +8,22 @@ from .models      import Comment, LikeComment, Movie, Rating
 
 
 class MovieDetailView(View):
-    def get(self, request, pk):
+    def get(self, request, movie_id):
         try:
-            results = []
-            movie   = Movie.objects.get(id=pk)
-            results.append(
+            movie   = Movie.objects.get(id=movie_id)
+            results = [
                 {
-                "movieBasicInfo": 
+                "movie_basic_info": 
                     {
                     "title"       : movie.title,
                     "release_date": str(movie.released_at),
                     "genre"       : [genre.name for genre in movie.genres.all()],
                     "country"     : movie.country,
-                    "runningTime" : movie.running_time_in_minute,
-                    "shortcomment": movie.description,
+                    "running_time" : movie.running_time_in_minute,
+                    "short_comment": movie.description,
                     "poster_url"  : movie.poster_image_url,
                     "grade"       : movie.grade.name,
-                    "rate"        : [rate.rate for rate in Rating.objects.filter(movie=pk)]
-                    ,
+                    "rate"        : [rate.rate for rate in Rating.objects.filter(movie=movie_id)],
                     "staffs": 
                         [
                             { 
@@ -40,18 +38,18 @@ class MovieDetailView(View):
                 "comments": 
                     [
                         {
-                            "userName"  : comment.user.name,
+                            "user_name"  : comment.user.name,
                             "comment"   : comment.description,
-                            "likeNumber": LikeComment.objects.filter(comment = comment).count()
+                            "like_number": LikeComment.objects.filter(comment = comment).count()
                         } 
-                        for comment in Comment.objects.filter(movie=pk)
+                        for comment in Comment.objects.filter(movie=movie_id)
                     ]
                 }
-            )   
+            ]   
             return JsonResponse({"movie" : results}, status= 200)
 
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
 
         except Movie.DoesNotExist:
-            return JsonResponse({"message" : "영화 정보가 없습니다."}, status=401)
+            return JsonResponse({"message" : "영화 정보가 없습니다."}, status=404)

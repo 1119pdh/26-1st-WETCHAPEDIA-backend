@@ -15,15 +15,15 @@ class MovieDetailView(View):
                 {
                 "movie_basic_info": 
                     {
-                    "title"       : movie.title,
-                    "release_date": str(movie.released_at),
-                    "genre"       : [genre.name for genre in movie.genres.all()],
-                    "country"     : movie.country,
+                    "title"        : movie.title,
+                    "release_date" : str(movie.released_at),
+                    "genre"        : [genre.name for genre in movie.genres.all()],
+                    "country"      : movie.country,
                     "running_time" : movie.running_time_in_minute,
                     "short_comment": movie.description,
-                    "poster_url"  : movie.poster_image_url,
-                    "grade"       : movie.grade.name,
-                    "rate"        : [rate.rate for rate in Rating.objects.filter(movie=movie_id)],
+                    "poster_url"   : movie.poster_image_url,
+                    "grade"        : movie.grade.name,
+                    "rate"         : [rate.rate for rate in Rating.objects.filter(movie=movie_id)],
                     "staffs": 
                         [
                             { 
@@ -39,7 +39,7 @@ class MovieDetailView(View):
                     [
                         {
                             "user_name"  : comment.user.name,
-                            "comment"   : comment.description,
+                            "comment"    : comment.description,
                             "like_number": LikeComment.objects.filter(comment = comment).count()
                         } 
                         for comment in Comment.objects.filter(movie=movie_id)

@@ -10,10 +10,9 @@ class MovieListView(View):
         staff = request.GET.get("staff")
         title = request.GET.get("title")
         rating = request.GET.get("rating")
-        page = int(request.GET.get("page", 1))
+        OFFSET = int(request.GET.get("offset", 0))
         page_size = int(request.GET.get("display", 15))
-        LIMIT = page_size * page
-        OFFSET = LIMIT - page_size
+        LIMIT = OFFSET + page_size
 
         q = Q()
         if source:

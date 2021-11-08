@@ -48,7 +48,7 @@ class SignInView(View):
             user         = User.objects.get(email=email)
             access_token = jwt.encode({'user_id' : user.id}, settings.SECRET_KEY, settings.ALGORITHM)
 
-            if not User.objects.filter(deleted_at = None):
+            if user.deleted_at != None:
                 return JsonResponse({'message' : 'UNACTIVATED_USER'}, status = 403)
 
             if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):

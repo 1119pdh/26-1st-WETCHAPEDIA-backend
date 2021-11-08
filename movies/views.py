@@ -23,8 +23,10 @@ class MovieDetailView(View):
                     "short_comment": movie.description,
                     "poster_url"   : movie.poster_image_url,
                     "grade"        : movie.grade.name,
-                    "rate"         : [rate.rate for rate in Rating.objects.filter(movie=movie_id)],
-                    "staffs": 
+                    "rate"         : [rate.rate for rate in Rating.objects.filter(movie=movie_id)]
+                    }
+                ,    
+                "staffs": 
                         [
                             { 
                             "name"              : staff.staff.name, 
@@ -34,7 +36,7 @@ class MovieDetailView(View):
                             }
                         for staff in movie.moviestaff_set.all()
                         ]
-                    },
+                ,
                 "comments": 
                     [
                         {

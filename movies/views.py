@@ -1,11 +1,11 @@
-<<<<<<< HEAD
 import json, re
 
 from django.conf  import settings
 from django.http  import JsonResponse, request
 from django.views import View
+from django.db.models import Q, Avg
 
-from .models      import Comment, LikeComment, Movie, Rating
+from .models      import *
 
 
 class MovieDetailView(View):
@@ -56,12 +56,6 @@ class MovieDetailView(View):
 
         except Movie.DoesNotExist:
             return JsonResponse({"message" : "영화 정보가 없습니다."}, status=404)
-=======
-from django.http import JsonResponse
-from django.views import View
-from django.db.models import Q, Avg
-from .models import *
-
 
 class MovieListView(View):
     def get(self, request):
@@ -107,4 +101,3 @@ class MovieListView(View):
         }
 
         return JsonResponse({"message": result}, status=200)
->>>>>>> main

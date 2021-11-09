@@ -1,4 +1,4 @@
-import json, re
+import json, re, bcrypt, jwt
 
 from django.conf  import settings
 from django.http  import JsonResponse, request
@@ -6,6 +6,9 @@ from django.views import View
 from django.db.models import Q, Avg
 
 from .models      import *
+from users.models import User
+from users.utils  import login_decorater
+
 
 
 class MovieDetailView(View):
@@ -105,3 +108,67 @@ class MovieListView(View):
         ]
 
         return JsonResponse({"message": result}, status=200)
+
+class RateListView(View):
+    @login_decorater
+    def post(self, request, movie_id):
+        try:
+            data = json.loads(request.body)
+
+            Rating.objects.create(
+                user_id  = request.user.id,
+                movie_id = movie_id,
+                rate     = data["rate"],
+            )            
+            return JsonResponse({"message" : "SUCCESS"}, status=201) 
+
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+    
+    @login_decorater
+    def get(self, request, movie_id):
+        try:
+            rating_data = Rating.objects.get(
+                user_id  = request.user.id,
+                movie_id = movie_id,
+            )
+            result = rating_data.rate
+
+            return JsonResponse({"rate" : result}, status=201)
+
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+    
+    @login_decorater
+    def put(self, request, movie_id):                
+        try:
+            data = json.loads(request.body)
+
+            rating_data = Rating.objects.get(
+                user_id  = request.user.id,
+                movie_id = movie_id,
+            )
+
+            rating_data.rate = data["rate"]
+            rating_data.save()
+            
+            return JsonResponse({"message" : "SUCCESS"}, status=201) 
+
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+    
+    @login_decorater
+    def delete(self, request, movie_id):
+        try:
+            data = json.loads(request.body)
+
+            Rating.objects.get(
+                user_id  = request.user.id,
+                movie_id = movie_id,
+                rate     = data["rate"],
+            ).delete()
+            
+            return JsonResponse({"message" : "SUCCESS"}, status=201) 
+
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)

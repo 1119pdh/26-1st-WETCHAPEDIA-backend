@@ -119,8 +119,11 @@ class RateListView(View):
                 user_id  = request.user.id,
                 movie_id = movie_id,
                 rate     = data["rate"],
-            )            
-            return JsonResponse({"message" : "SUCCESS"}, status=201) 
+            )
+
+            user_rate = Rating.objects.get(user_id=request.user.id, movie_id=movie_id)
+                       
+            return JsonResponse({"rate" : user_rate.rate}, status=201) 
 
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)

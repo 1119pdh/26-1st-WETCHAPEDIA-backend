@@ -160,12 +160,9 @@ class RateListView(View):
     @login_decorater
     def delete(self, request, movie_id):
         try:
-            data = json.loads(request.body)
-
             Rating.objects.get(
                 user_id  = request.user.id,
                 movie_id = movie_id,
-                rate     = data["rate"],
             ).delete()
             
             return JsonResponse({"message" : "SUCCESS"}, status=201) 

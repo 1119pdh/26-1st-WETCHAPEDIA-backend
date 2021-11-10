@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views import View
 
 from users.models import User
-from movies.models import Movie, WishList
+from movies.models import WishList
 from users.utils import validate_email, validate_password, login_decorater
 from django.conf import settings
 
@@ -66,14 +66,14 @@ class WishListView(View):
     def post(self, request):
         data = json.loads(request.body)
         movie_id = data["movie_id"]
-        if not WishList.objects.filter(movie_id=movie_id, user_id=request.user.id).exists():
-            WishList.objects.create(user=request.user, movie=Movie.objects.get(id=movie_id))
-            return JsonResponse({"message": "WISHLIST_CREATE_SUCCESS"}, status=201)
 
-        wishlist_data = WishList.objects.get(movie_id=movie_id, user_id=request.user.id)
-        wishlist_data.delete()
+        wishlist_obj, created = WishList.objects.get_or_create(movie_id=movie_id, user_id=request.user.id)
 
-        return JsonResponse({"message": "WISHLIST_DELETE_SUCCESS"}, status=200)
+        if not created:
+            wishlist_obj.delete()
+            return JsonResponse({"message": "WISHLIST_DELETE_SUCCESS"}, status=200)
+
+        return JsonResponse({"message": "WISHLIST_CREATE_SUCCESS"}, status=201)
 
     @login_decorater
     def get(self, request):
@@ -86,4 +86,4 @@ class WishListView(View):
             }
             for wishlist in wishlists
         ]
-        return JsonResponse({"MESSAGE": result}, status=200)
+        return JsonResponse({"message": result}, status=200)

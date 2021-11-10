@@ -150,7 +150,7 @@ class CommentView(View):
             
             comment_info.delete()
             
-            return JsonResponse({'message' : 'SUCCESS'}, status = 200)
+            return JsonResponse({'message' : 'SUCCESS'}, status = 204)
         
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)

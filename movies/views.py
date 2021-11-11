@@ -1,4 +1,4 @@
-import json
+import json, re
 
 from django.http       import JsonResponse
 from django.views      import View
@@ -8,7 +8,6 @@ from json.decoder      import JSONDecodeError
 from users.utils       import login_decorater
 from .models           import *
 
-
 class MovieDetailView(View):
     def get(self, request, movie_id):
         try:
@@ -17,7 +16,7 @@ class MovieDetailView(View):
                 "movie_basic_info": 
                     {
                         "title"        : movie.title,
-                        "release_date" : str(movie.released_at),
+                        "release_date" : movie.released_at,
                         "genre"        : [genre.name for genre in movie.genres.all()],
                         "country"      : movie.country,
                         "running_time" : movie.running_time_in_minute,
@@ -25,8 +24,7 @@ class MovieDetailView(View):
                         "poster_url"   : movie.poster_image_url,
                         "grade"        : movie.grade.name,
                         "rate"         : [rate.rate for rate in Rating.objects.filter(movie=movie_id)]
-                    }
-                    ,    
+                    },   
                 "staffs": 
                     [
                         { 
@@ -36,8 +34,7 @@ class MovieDetailView(View):
                             "profile_image_url" : staff.staff.profile_image_url
                         }
                         for staff in movie.moviestaff_set.all()
-                    ]
-                    ,
+                    ],
                 "comments": 
                     [
                         {
@@ -106,7 +103,87 @@ class MovieListView(View):
         ]
 
         return JsonResponse({"message": result}, status=200)
+
+class RateListView(View):
+    def validate_rate(self, rate):
+        return re.match('^[+-]?\d*(\.?\d*)$', rate)
+
+    @login_decorater
+    def post(self, request, movie_id):
+        try:
+            data = json.loads(request.body)
+
+            if not self.validate_rate(str(data["rate"])):
+                return JsonResponse({"message" : "정확한 숫자를 입력하세요"}, status=400)
+
+            user_rate = Rating.objects.create(
+                user_id  = request.user.id,
+                movie_id = movie_id,
+                rate     = data["rate"],
+            )
+
+            return JsonResponse({"rate" : user_rate.rate}, status=201) 
+        
+        except JSONDecodeError:
+            return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
+
+        except KeyError:
+            return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
+
+    @login_decorater
+    def get(self, request, movie_id):
+        try:
+            rating_data  = Rating.objects.get(
+                user_id  = request.user.id,
+                movie_id = movie_id,
+            )
+            result = rating_data.rate
+
+            return JsonResponse({"rate" : result}, status=200)
+
+        except Rating.DoesNotExist:
+            return JsonResponse({"message" : "별점 정보가 없습니다."}, status=404)
+
+    @login_decorater
+    def put(self, request, movie_id):                
+        try:
+            data = json.loads(request.body)
+
+            if not self.validate_rate(data["rate"]):
+                return JsonResponse({"message" : "정확한 숫자를 입력하세요"}, status=400)
+
+            rating_data  = Rating.objects.get(
+                user_id  = request.user.id,
+                movie_id = movie_id,
+            )
+
+            rating_data.rate = data["rate"]
+            rating_data.save()
+            
+            return JsonResponse({"message" : "SUCCESS"}, status=200) 
+
+        except JSONDecodeError:
+            return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
+
+        except KeyError:
+            return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
+
+        except Rating.DoesNotExist:
+            return JsonResponse({"message" : "별점 정보가 없습니다."}, status=404)
     
+    @login_decorater
+    def delete(self, request, movie_id):
+        try:
+            Rating.objects.get(
+                user_id  = request.user.id,
+                movie_id = movie_id,
+            ).delete()
+            
+            return JsonResponse({"message" : "SUCCESS"}, status=204)
+        
+        except Rating.DoesNotExist:
+            return JsonResponse({"message" : "별점 정보가 없습니다."}, status=404)
+          
 class CommentView(View):
     @login_decorater
     def post(self, request, movie_id):
@@ -118,11 +195,12 @@ class CommentView(View):
                 movie_id    = movie_id,
                 description = data['description']
             )
-            
+
             return JsonResponse({'message' : 'SUCCESS'}, status = 201)
-        
+
         except JSONDecodeError:
             return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
+
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
 
@@ -140,6 +218,7 @@ class CommentView(View):
         
         except JSONDecodeError:
             return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
+
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
         

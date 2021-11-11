@@ -48,7 +48,7 @@ class MovieDetailView(View):
                         for comment in Comment.objects.filter(movie=movie_id)
                     ]
             }
-            return JsonResponse({"movie" : results}, status= 200)
+            return JsonResponse({"movie" : results}, status=200)
 
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
@@ -159,7 +159,7 @@ class CommentView(View):
             return JsonResponse({'message' : 'SUCCESS'}, status = 204)
         
         except Comment.DoesNotExist:
-            return JsonResponse({'message' : 'INVALID_COMMENT'})
+            return JsonResponse({'message' : 'INVALID_COMMENT'}, status = 404)
         
     @login_decorater
     def get(self, request, movie_id):
@@ -173,4 +173,4 @@ class CommentView(View):
             return JsonResponse({'description' : result}, status = 200)
         
         except Comment.DoesNotExist:
-            return JsonResponse({'message' : 'INVALID_COMMENT'})
+            return JsonResponse({'message' : 'INVALID_COMMENT'}, status = 404)

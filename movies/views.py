@@ -132,8 +132,7 @@ class RateListView(View):
     
     @login_decorater
     def get(self, request, movie_id):
-        try:
-            rating_data = Rating.objects.get(
+            rating_data  = Rating.objects.get(
                 user_id  = request.user.id,
                 movie_id = movie_id,
             )
@@ -141,8 +140,7 @@ class RateListView(View):
 
             return JsonResponse({"rate" : result}, status=200)
 
-        except KeyError:
-            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+
     
     @login_decorater
     def put(self, request, movie_id):                
@@ -152,7 +150,7 @@ class RateListView(View):
             if not self.validate_rate(data["rate"]):
                 return JsonResponse({"message" : "정확한 숫자를 입력하세요"}, status=400)
 
-            rating_data = Rating.objects.get(
+            rating_data  = Rating.objects.get(
                 user_id  = request.user.id,
                 movie_id = movie_id,
             )
@@ -170,16 +168,9 @@ class RateListView(View):
     
     @login_decorater
     def delete(self, request, movie_id):
-        try:
             Rating.objects.get(
                 user_id  = request.user.id,
                 movie_id = movie_id,
             ).delete()
             
-            return JsonResponse({"message" : "SUCCESS"}, status=204) 
-
-        except JSONDecodeError:
-            return JsonResponse({"message" : "JSON 데이터가 아닙니다"}, status=400)
-
-        except KeyError:
-            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+            return JsonResponse({"message" : "SUCCESS"}, status=204)

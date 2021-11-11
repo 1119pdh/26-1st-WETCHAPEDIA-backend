@@ -113,7 +113,7 @@ class RateListView(View):
         try:
             data = json.loads(request.body)
 
-            if not self.validate_rate(data["rate"]):
+            if not self.validate_rate(str(data["rate"])):
                 return JsonResponse({"message" : "정확한 숫자를 입력하세요"}, status=400)
 
             user_rate = Rating.objects.create(
@@ -140,8 +140,6 @@ class RateListView(View):
 
             return JsonResponse({"rate" : result}, status=200)
 
-
-    
     @login_decorater
     def put(self, request, movie_id):                
         try:

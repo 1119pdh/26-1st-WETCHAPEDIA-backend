@@ -149,18 +149,28 @@ class CommentView(View):
     @login_decorater
     def delete(self, request, movie_id):
         
-        user_id      = request.user.id
-        comment_info = Comment.objects.get(user_id = user_id, movie_id = movie_id)
+        try:
         
-        comment_info.delete()
+            user_id      = request.user.id
+            comment_info = Comment.objects.get(user_id = user_id, movie_id = movie_id)
+            
+            comment_info.delete()
         
-        return JsonResponse({'message' : 'SUCCESS'}, status = 204)        
+            return JsonResponse({'message' : 'SUCCESS'}, status = 204)
+        
+        except Comment.DoesNotExist:
+            return JsonResponse({'message' : 'INVALID_COMMENT'})
         
     @login_decorater
     def get(self, request, movie_id):
         
-        user_id      = request.user.id
-        comment_info = Comment.objects.get(user_id = user_id, movie_id = movie_id)
-        result       = comment_info.description
+        try:
         
-        return JsonResponse({'description' : result}, status = 200)
+            user_id      = request.user.id
+            comment_info = Comment.objects.get(user_id = user_id, movie_id = movie_id)
+            result       = comment_info.description
+        
+            return JsonResponse({'description' : result}, status = 200)
+        
+        except Comment.DoesNotExist:
+            return JsonResponse({'message' : 'INVALID_COMMENT'})

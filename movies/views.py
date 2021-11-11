@@ -3,6 +3,7 @@ import json
 from django.http       import JsonResponse
 from django.views      import View
 from django.db.models  import Q, Avg
+from json.decoder      import JSONDecodeError
 
 from users.utils       import login_decorater
 from .models           import *
@@ -122,6 +123,8 @@ class CommentView(View):
             
             return JsonResponse({'message' : 'SUCCESS'}, status = 201)
         
+        except JSONDecodeError:
+            return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
 
@@ -138,22 +141,20 @@ class CommentView(View):
             
             return JsonResponse({'message' : 'SUCCESS'}, status = 200)
         
+        except JSONDecodeError:
+            return JsonResponse({"message" : "JSON_DECODE_ERROR"}, status=400)
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
         
     @login_decorater
     def delete(self, request, movie_id):
         
-        try:
-            user_id      = request.user.id
-            comment_info = Comment.objects.get(user_id = user_id, movie_id = movie_id)
-            
-            comment_info.delete()
-            
-            return JsonResponse({'message' : 'SUCCESS'}, status = 204)
+        user_id      = request.user.id
+        comment_info = Comment.objects.get(user_id = user_id, movie_id = movie_id)
         
-        except KeyError:
-            return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
+        comment_info.delete()
+        
+        return JsonResponse({'message' : 'SUCCESS'}, status = 204)        
         
     @login_decorater
     def get(self, request, movie_id):

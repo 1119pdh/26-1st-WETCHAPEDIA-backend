@@ -107,7 +107,6 @@ class MovieListView(View):
 
         return JsonResponse({"message": result}, status=200)
     
-    
 class CommentView(View):
     @login_decorater
     def post(self, request, movie_id):
@@ -150,7 +149,6 @@ class CommentView(View):
     def delete(self, request, movie_id):
         
         try:
-        
             user_id      = request.user.id
             comment_info = Comment.objects.get(user_id = user_id, movie_id = movie_id)
             
@@ -165,7 +163,6 @@ class CommentView(View):
     def get(self, request, movie_id):
         
         try:
-        
             user_id      = request.user.id
             comment_info = Comment.objects.get(user_id = user_id, movie_id = movie_id)
             result       = comment_info.description

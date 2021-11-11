@@ -129,9 +129,10 @@ class RateListView(View):
 
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
-    
+
     @login_decorater
     def get(self, request, movie_id):
+        try:
             rating_data  = Rating.objects.get(
                 user_id  = request.user.id,
                 movie_id = movie_id,
@@ -139,6 +140,9 @@ class RateListView(View):
             result = rating_data.rate
 
             return JsonResponse({"rate" : result}, status=200)
+
+        except Rating.DoesNotExist:
+            return JsonResponse({"message" : "별점 정보가 없습니다."}, status=404)
 
     @login_decorater
     def put(self, request, movie_id):                
@@ -163,12 +167,19 @@ class RateListView(View):
 
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+
+        except Rating.DoesNotExist:
+            return JsonResponse({"message" : "별점 정보가 없습니다."}, status=404)
     
     @login_decorater
     def delete(self, request, movie_id):
+        try:
             Rating.objects.get(
                 user_id  = request.user.id,
                 movie_id = movie_id,
             ).delete()
             
             return JsonResponse({"message" : "SUCCESS"}, status=204)
+        
+        except Rating.DoesNotExist:
+            return JsonResponse({"message" : "별점 정보가 없습니다."}, status=404)
